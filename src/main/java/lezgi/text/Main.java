@@ -1,7 +1,6 @@
 package lezgi.text;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,10 +9,11 @@ public class Main {
 
     public static void main(String[] args) {
         List<String> letters = new ArrayList<>();
-        letters.addAll(readTxtFile("src/main/resources/lezgi-text.txt"));
+        letters.addAll(readTxtFile("src/main/resources/one-million-lezgi-letters.txt"));
         System.out.println("Общее количество букв: " + letters.size());
 
         getStatisticsForEachLetter(letters);
+//        createNewFile("one-million-lezgi-letters.txt");
     }
 
     private static void getStatisticsForEachLetter(List<String> letters) {
@@ -30,7 +30,28 @@ public class Main {
         }
     }
 
-    /* Чтение файла inputData с текстом */
+    private static void createNewFile(String newFileName) {
+        final List<String> texts = new ArrayList<>();
+        try (BufferedReader in = new BufferedReader(new FileReader("src/main/resources/lezgi-text.txt"))) {
+            for (String line = in.readLine(); line != null; line = in.readLine()) {
+                if (!line.isEmpty() && !line.isBlank()) {
+                    texts.add(line.replace("I", "Ӏ"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try (PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(newFileName)))) {
+            for (String text : texts) {
+                out.println(text);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /* Чтение файла с текстом */
     private static List<String> readTxtFile(String filePath) {
         final List<String> lines = new ArrayList<>();
         try (BufferedReader in = new BufferedReader(new FileReader(filePath))) {
@@ -44,7 +65,7 @@ public class Main {
     }
 
     private static List<String> splitStringIntoLetters(String fileLine) {
-        String regex = "Гъ|Гь|Къ|Кь|КI|ПI|ТI|Уь|Хъ|Хь|ЦI|ЧI|[А-Яа-я]";
+        String regex = "Гъ|Гь|Къ|Кь|КӀ|ПӀ|ТӀ|Уь|Хъ|Хь|ЦӀ|ЧӀ|[А-Яа-я]";
 
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
         Matcher matcher = pattern.matcher(fileLine);
